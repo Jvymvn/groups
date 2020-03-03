@@ -112,7 +112,7 @@ export default function App() {
         <div className={classes.heroContent}>
           <Container maxWidth="sm">
             <Typography component="h1" variant="h2" align="center" color="textPrimary" gutterBottom>
-              Cassandra Groups
+              Cassandra.Network
             </Typography>
             <Typography variant="h5" align="center" color="textSecondary" paragraph>
               Lorem ipsum dolor sit amet, consectetur adipisicing elit. Maiores, molestiae neque placeat reiciendis est deserunt, ut molestias quia recusandae asperiores qui dolore quod. Accusamus, quo?
