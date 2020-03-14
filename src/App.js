@@ -17,33 +17,84 @@ import Map from 'pigeon-maps'
 import Marker from 'pigeon-marker'
 import Overlay from 'pigeon-overlay'
 
-const map = (
-  <Map center={[40.879, 4.6997]} zoom={2} width={1000} height={575}>
-    <Marker anchor={[36.2048, 138.2529]} onClick={({ event, anchor, payload }) => { }} />
-    <Marker anchor={[52.5200, 13.4050]} onClick={({ event, anchor, payload }) => { }} />
-    <Marker anchor={[23.6345, 102.5528]} onClick={({ event, anchor, payload }) => { }} />
-    <Marker anchor={[37.0902, -100.7129]} onClick={({ event, anchor, payload }) => { }} />
-    <Marker anchor={[23.6345, 0.5528]} onClick={({ event, anchor, payload }) => { }} />
-    <Marker anchor={[-23.6345, -65.5528]} onClick={({ event, anchor, payload }) => { }} />
+// const geocodeURL = "https://us1.locationiq.com/v1/search.php?key=YOUR_PRIVATE_TOKEN&q=SEARCH_STRING&format=json"
+// let key = "e12621471dbd04"
+// let latLng = [];
+// const geo = `https://us1.locationiq.com/v1/search.php?key=${key}&q=${state}&format=json`
+// states.forEach((state) => {
+//   fetch(geo).then((res) => res.json()).then((data) => latLng.push(data[0]))
+// })
 
-
-
-    <Overlay anchor={[50.879, 4.6997]} offset={[120, 79]}>
-      {/* <img src='pigeon.jpg' width={6400} height={5580} alt='' /> */}
-    </Overlay>
-  </Map>
-)
-let members = []
-// console.log(process.env.REACT_APP_API_KEY)
-let airtable = fetch("https://api.airtable.com/v0/appKPpuxHmcbNwiY5/Cassandra?view=Master",{
-  headers:{
-    Authorization: `Bearer ${process.env.REACT_APP_API_KEY}`,
+//Static placeholder markers
+let placeholderMarkers = [
+  {
+    lat: "54.7023545",
+    lon: "107.5912997",
+    display_name: "United Kingdom"
+  },
+  {
+    lat: "39.5695818",
+    lon: "117.5912997",
+display_name: "Palma, Balearic Islands, Spain"
+  },
+  {
+    lat: "6.4550575",
+    lon: "107.5912997",
+display_name: "Lagos, Lagos Island, Lagos, 100242, Nigeria"
+  },
+  {
+    lat: "-33.928992",
+    lon: "107.5912997",
+display_name: "Cape Town, City of Cape Town, Western Cape"
+  },
+  {
+    lat: "34.0536909",
+lon: "118.2427666",
+display_name: "Los Angeles, Los Angeles County, California"
+  },
+  {
+    lat: "31.5313113",
+    lon: "107.5912997",
+display_name: "Israel"
+  },
+  {
+    lat: "45.5202471",
+lon: "122.6741949",
+display_name: "Portland, Multnomah County, Oregon, USA"
+  },
+  {
+    lat: "-19.9527237",
+lon: "127.5912997",
+display_name: "Philadelphia, Philadelphia County, Pennsylvania, USA"
+  },
+  {
+    lat: "40.8088861",
+lon: "137.5912997",
+display_name: "Lincoln, Lancaster County, Nebraska, USA"
+  },
+  {
+    lat: "55.9533456",
+lon: "157.5912997",
+display_name: "Edinburgh, City of Edinburgh, Scotland,"
+  },
+  {
+    lat: "12.9791198",
+lon: "167.5912997",
+display_name: "Bengaluru, Bangalore North, Bangalore Urban"
   }
-})
-.then((res) => res.json()).then((data) => data.records.forEach((record) => members.push(record)))
-console.log("Members",members)
 
-let states = ['Alabama','Alaska','American Samoa','Arizona','Arkansas','California','Colorado','Connecticut','Delaware','District of Columbia','Federated States of Micronesia','Florida','Georgia','Guam','Hawaii','Idaho','Illinois','Indiana','Iowa','Kansas','Kentucky','Louisiana','Maine','Marshall Islands','Maryland','Massachusetts','Michigan','Minnesota','Mississippi','Missouri','Montana','Nebraska','Nevada','New Hampshire','New Jersey','New Mexico','New York','North Carolina','North Dakota','Northern Mariana Islands','Ohio','Oklahoma','Oregon','Palau','Pennsylvania','Puerto Rico','Rhode Island','South Carolina','South Dakota','Tennessee','Texas','Utah','Vermont','Virgin Island','Virginia','Washington','West Virginia','Wisconsin','Wyoming'];
+]
+
+// console.log(process.env.REACT_APP_API_KEY)
+// let airtable = fetch("https://api.airtable.com/v0/appKPpuxHmcbNwiY5/Cassandra?view=Master",{
+//   headers:{
+//     Authorization: `Bearer ${process.env.REACT_APP_API_KEY}`,
+//   }
+// })
+// .then((res) => res.json()).then((data) => data.records.forEach((record) => members.push(record)))
+// console.log("Members",members)
+
+// let states = ['Alabama','Alaska','American Samoa','Arizona','Arkansas','California','Colorado','Connecticut','Delaware','District of Columbia','Federated States of Micronesia','Florida','Georgia','Guam','Hawaii','Idaho','Illinois','Indiana','Iowa','Kansas','Kentucky','Louisiana','Maine','Marshall Islands','Maryland','Massachusetts','Michigan','Minnesota','Mississippi','Missouri','Montana','Nebraska','Nevada','New Hampshire','New Jersey','New Mexico','New York','North Carolina','North Dakota','Northern Mariana Islands','Ohio','Oklahoma','Oregon','Palau','Pennsylvania','Puerto Rico','Rhode Island','South Carolina','South Dakota','Tennessee','Texas','Utah','Vermont','Virgin Island','Virginia','Washington','West Virginia','Wisconsin','Wyoming'];
 
 function Copyright() {
   return (
@@ -92,17 +143,69 @@ const useStyles = makeStyles(theme => ({
 
 // const cards = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
+
+
 export default function App() {
   const classes = useStyles();
   const [members, setMembers] = useState([]);
-  let airtable = fetch("https://api.airtable.com/v0/appKPpuxHmcbNwiY5/Cassandra?view=Master",{
-  headers:{
-    Authorization: `Bearer ${process.env.REACT_APP_API_KEY}`,
+  const [states, setStates] = useState([]);
+
+  let airtable = async () => {
+    await fetch("https://api.airtable.com/v0/appKPpuxHmcbNwiY5/Cassandra?view=Master", {
+      headers: {
+        Authorization: `Bearer ${process.env.REACT_APP_API_KEY}`,
+      }
+    })
+      .then((res) => res.json()).then((data) => {
+        console.log("DATA", data);
+        setMembers(data.records);
+      })
   }
-})
-.then((res) => res.json()).then((data) => setMembers(data.records))
-  console.log("STATE",members)
-  
+
+  if (members.length === 0) {
+    airtable();
+  }
+
+
+  if (states.length === 0) {
+    let newMembers = members;
+    const shuffled = newMembers.sort(() => 0.5 - Math.random());
+    let selected = shuffled.slice(0, 25);
+    for (let i = 0; i < selected.length; i++) {
+      states.push(selected[i].fields.City);
+    }
+  }
+
+  console.log("STATES!!!", states);
+  let key = "e12621471dbd04"
+  let latLng = [];
+  states.forEach((state) => {
+    // setTimeout(fetch(`https://us1.locationiq.com/v1/search.php?key=${key}&q=${state}&format=json`).then((res) => res.json()).then((data) => latLng.push(data[0])), 4000);
+    fetch(`https://us1.locationiq.com/v1/search.php?key=${key}&q=${state}&format=json`).then((res) => res.json()).then((data) => latLng.push(data[0]))
+  })
+  console.log("LATLNG!!!", latLng);
+
+
+
+  const map = (
+    <Map center={[40.879, 4.6997]} zoom={2} width={1000} height={575} touchEvents={false} mouseEvents={false}>
+      {placeholderMarkers.map((marker) => <Marker anchor={[marker.lat, marker.lon]} onClick={({ event, anchor, payload }) => {console.log(marker.display_name) }} />)}
+      {/* <Marker anchor={[36.2048, 138.2529]} onClick={({ event, anchor, payload }) => { }} />
+      <Marker anchor={[52.5200, 13.4050]} onClick={({ event, anchor, payload }) => { }} />
+      <Marker anchor={[23.6345, 102.5528]} onClick={({ event, anchor, payload }) => { }} />
+      <Marker anchor={[37.0902, -100.7129]} onClick={({ event, anchor, payload }) => { }} />
+      <Marker anchor={[23.6345, 0.5528]} onClick={({ event, anchor, payload }) => { }} />
+      <Marker anchor={[-23.6345, -65.5528]} onClick={({ event, anchor, payload }) => { }} /> */}
+
+
+
+      <Overlay anchor={[50.879, 4.6997]} offset={[120, 79]}>
+        {/* <img src='pigeon.jpg' width={6400} height={5580} alt='' /> */}
+      </Overlay>
+    </Map>
+  )
+
+
 
   return (
     <React.Fragment>
@@ -134,19 +237,17 @@ export default function App() {
           </Container>
         </div>
         <div style={{ textAlign: 'center' }}>
-          <a href="https://google.com">
-            <img class="aligncenter wp-image-1181" src="https://sparkhub.databricks.com/wp-content/uploads/2015/11/Spark-Meetups.png" alt="Spark-Meetups" width="951" height="494" srcset="https://sparkhub.databricks.com/wp-content/uploads/2015/11/Spark-Meetups.png 2052w, https://sparkhub.databricks.com/wp-content/uploads/2015/11/Spark-Meetups-300x156.png 300w, https://sparkhub.databricks.com/wp-content/uploads/2015/11/Spark-Meetups-1024x532.png 1024w" sizes="(max-width: 951px) 100vw, 951px" />
-          </a>
+          <p style={{"color": "red"}}>MARKERS CURRENTLY CONSOLE LOGS GROUP NAME</p>
           {map}
         </div>
         <Container maxWidth="sm">
-            <Typography component="h2" variant="h3" align="center" color="textPrimary" gutterBottom>
+          <Typography component="h2" variant="h3" align="center" color="textPrimary" gutterBottom>
             Starting or running a local Apache® Cassandra™ Group?
             </Typography>
-            <Typography variant="h5" align="center" color="textSecondary" paragraph>
+          <Typography variant="h5" align="center" color="textSecondary" paragraph>
             If you are running (or looking to run) an Apache Spark meetup, we would like to provide these resources – Lorem ipsum dolor sit amet, consectetur adipisicing elit. Soluta culpa officia numquam? Fuga sed doloribus magni provident! Maxime debitis nihil iusto itaque cupiditate, consectetur animi quasi repellendus inventore, facilis minus.
             </Typography>
-          </Container>
+        </Container>
         <Container className={classes.cardGrid} maxWidth="md">
           {/* End hero unit */}
           <Grid container spacing={4}>
@@ -162,15 +263,15 @@ export default function App() {
                     <Typography gutterBottom variant="h5" component="h2">
                       {member.fields['Group Name']}
                     </Typography>
-                    <br/>
+                    <br />
                     <Typography>
-                    City: {member.fields.City}
+                      City: {member.fields.City}
                     </Typography>
                     <Typography>
-                    Organizer: {member.fields['Organizer Name']}
+                      Organizer: {member.fields['Organizer Name']}
                     </Typography>
                     <a href={member.fields['Organizer LinkedIn']}>
-                    {member.fields['Organizer LinkedIn']}
+                      {member.fields['Organizer LinkedIn']}
                     </a>
                   </CardContent>
                   {/* <CardActions>
@@ -184,7 +285,7 @@ export default function App() {
                 </Card>
               </Grid>
             ))}
-          
+
           </Grid>
         </Container>
       </main>
@@ -194,7 +295,7 @@ export default function App() {
         © 2020 Anant Corporation, All Rights Reserved.
         </Typography> */}
         <Typography variant="subtitle1" align="center" color="textSecondary" component="p">
-        © 2020 Anant Corporation, All Rights Reserved.
+          © 2020 Anant Corporation, All Rights Reserved.
         </Typography>
         <Copyright />
       </footer>
